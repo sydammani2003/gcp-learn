@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="Find the pin code for any area. Select a state, district, and area to get the accurate postal code instantly.">
+        <meta name="keywords" content="Indian pin codes, postal codes, area pin codes, state-wise pin codes, pincode finder,code,pin,address,6 digits pincode of my location, 6 digits pincode of india, Find my pincode, pin code list, location pin code, enter pin code number, pin code location track, find my, find and trace, trace pin code, codes, pins, postcode, postal code, post office find by pincode, post office tracking">
+        <meta name="author" content="SR">
+        <link rel="canonical" href="our website link">
+        <title>Pincode Finder</title>
+    
+<meta property="og:url" content="our website link">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Pincode Finder">
+<meta property="og:description" content="Find the pin code for any area. Select a state, district, and area to get the accurate postal code instantly.">
+<meta property="og:image" content="https://opengraph.b-cdn.net/production/images/ab24acab-ae8b-44b2-bd10-e184415a1370.png?token=U7iG6Q_E321FWG_gSljwJkffhtXGcduS2F3mOsyNmgk&height=433&width=1200&expires=33263338440">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:domain" content="our domain name">
+<meta property="twitter:url" content="our website link">
+<meta name="twitter:title" content="Pincode Finder">
+<meta name="twitter:description" content="Find the pin code for any area. Select a state, district, and area to get the accurate postal code instantly.">
+<meta name="twitter:image" content="https://opengraph.b-cdn.net/production/images/ab24acab-ae8b-44b2-bd10-e184415a1370.png?token=U7iG6Q_E321FWG_gSljwJkffhtXGcduS2F3mOsyNmgk&height=433&width=1200&expires=33263338440">
+      
+
+       <script type="application/ld+json">
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Pincode Finder",
+          "url": "our website link",
+          "description": "Find the pin code for any area. Select a state, district, and area to get the accurate postal code instantly.",
+          "author": {
+            "@type": "Person",
+            "name": "SR"
+          }
+        }
+        </script>
+        <link rel="stylesheet" href="styles.css">
+</head>   
+<body>
+    <header>
+        <div class="logo">Pincode Finder</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Find Your Pincode</h1>
+        <div class="dropdowns">
+            <select id="state">
+                <option value="">Select State</option>
+                
+            </select>                
+            
+            <select id="district" disabled>
+                <option value="">Select District</option>
+            </select>
+            
+            <select id="area" disabled>
+                <option value="">Select Area</option>
+            </select>
+        </div>
+        <div class="result">
+            <p id="pincode">Pincode: </p>
+        </div>
+    </main>
+
+    <script>
+        
+        function parseCSV(text) {
+            const lines = text.split("\n");
+            const headers = lines[0].split(",");
+            
+            const data = lines.slice(1).map(line => {
+                const values = line.split(",");
+                if (values.length !== headers.length) {
+                    return null; 
+                }
+                let entry = {};
+                headers.forEach((header, index) => {
+                    entry[header.trim()] = values[index] ? values[index].trim() : ""; 
+                });
+                return entry;
+            }).filter(row => row !== null); 
+
+            return data;
+        }
+
+        
+        function populateDropdown(dropdown, items, valueKey) {
+            dropdown.innerHTML = ""; 
+            const defaultOption = document.createElement("option");
+            defaultOption.text = "Select";
+            defaultOption.value = "";
+            dropdown.appendChild(defaultOption);
+
+        
+            items.sort((a, b) => a[valueKey].localeCompare(b[valueKey]));
+
+            items.forEach(item => {
+                const option = document.createElement("option");
+                option.value = item[valueKey];
+                option.text = item[valueKey];
+                dropdown.appendChild(option);
+            });
+
+            dropdown.disabled = false; 
+        }
+
+        let csvData = [];
+
+        window.onload = function () {
+            const stateDropdown = document.getElementById("state");
+            const districtDropdown = document.getElementById("district");
+            const areaDropdown = document.getElementById("area");
+            const pincodeDisplay = document.getElementById("pincode");
+
+            
+            fetch('postal_areas.csv')
+                .then(response => response.text())
+                .then(text => {
+                    csvData = parseCSV(text);
+
+                    
+                    const uniqueStates = [...new Set(csvData.map(row => row.State))];
+                    populateDropdown(stateDropdown, uniqueStates.map(state => ({ State: state })), 'State');
+                });
+
+            
+            stateDropdown.addEventListener('change', function () {
+                const selectedState = this.value;
+                if (selectedState) {
+                    const filteredDistricts = [...new Set(csvData.filter(row => row.State === selectedState).map(row => row.District))];
+                    populateDropdown(districtDropdown, filteredDistricts.map(district => ({ District: district })), 'District');
+                    areaDropdown.innerHTML = ""; 
+                    areaDropdown.disabled = true; 
+                    pincodeDisplay.textContent = ""; 
+                } else {
+                    districtDropdown.innerHTML = ""; 
+                    districtDropdown.disabled = true;
+                    areaDropdown.innerHTML = "";
+                    areaDropdown.disabled = true;
+                }
+            });
+
+            
+            districtDropdown.addEventListener('change', function () {
+                const selectedState = stateDropdown.value;
+                const selectedDistrict = this.value;
+                if (selectedDistrict) {
+                    const filteredAreas = [...new Set(csvData.filter(row => row.State === selectedState && row.District === selectedDistrict).map(row => row.Area))];
+                    populateDropdown(areaDropdown, filteredAreas.map(area => ({ Area: area })), 'Area');
+                    pincodeDisplay.textContent = ""; 
+                } else {
+                    areaDropdown.innerHTML = "";
+                    areaDropdown.disabled = true;
+                }
+            });
+
+            
+            areaDropdown.addEventListener('change', function () {
+                const selectedState = stateDropdown.value;
+                const selectedDistrict = districtDropdown.value;
+                const selectedArea = this.value;
+                const selectedRow = csvData.find(row => row.State === selectedState && row.District === selectedDistrict && row.Area === selectedArea);
+
+                if (selectedRow) {
+                    pincodeDisplay.textContent = "Pincode: " + selectedRow.Pincode;
+                } else {
+                    pincodeDisplay.textContent = "Pincode not found!";
+                }
+            });
+        };
+    </script>
+</body>
+</html>
