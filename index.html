@@ -121,7 +121,7 @@
             const pincodeDisplay = document.getElementById("pincode");
 
             
-            fetch('postal_areas.csv')
+            fetch('https://storage.googleapis.com/postal_areas/postal_areas.csv')
                 .then(response => response.text())
                 .then(text => {
                     csvData = parseCSV(text);
