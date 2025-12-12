@@ -1,5 +1,8 @@
 FROM nginx:alpine
+
 WORKDIR /usr/share/nginx/html
-COPY . /usr/share/nginx/html
+
+# Copy all site files (index, about, styles.css, etc.)
+COPY . .
+
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
