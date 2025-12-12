@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://gcp-learn-385570434962.asia-south1.run.app"],
+    "method": ["GET"],
+    "responseHeader": ["Content-Type"],
+    "maxAgeSeconds": 3600
+  }
+]
